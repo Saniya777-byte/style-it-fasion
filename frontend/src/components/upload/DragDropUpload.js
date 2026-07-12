@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { UploadCloud, File, AlertCircle, CheckCircle, Trash2 } from "lucide-react";
+import { UploadCloud, File, Trash2 } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 export function DragDropUpload({ onFileSelect, selectedFile, onClear }) {
@@ -11,42 +11,25 @@ export function DragDropUpload({ onFileSelect, selectedFile, onClear }) {
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setIsDragActive(true);
-    } else if (e.type === "dragleave") {
-      setIsDragActive(false);
-    }
+    if (e.type === "dragenter" || e.type === "dragover") setIsDragActive(true);
+    else if (e.type === "dragleave") setIsDragActive(false);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      validateAndSelectFile(file);
-    }
+    if (e.dataTransfer.files?.[0]) validateAndSelectFile(e.dataTransfer.files[0]);
   };
 
   const handleChange = (e) => {
     e.preventDefault();
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      validateAndSelectFile(file);
-    }
+    if (e.target.files?.[0]) validateAndSelectFile(e.target.files[0]);
   };
 
   const validateAndSelectFile = (file) => {
-    // Basic validations
-    const allowedTypes = ["video/mp4", "audio/mpeg", "audio/wav", "audio/mp3", "application/pdf"];
-    const maxSize = 500 * 1024 * 1024; // 500MB
-
-    if (file.size > maxSize) {
-      alert("File exceeds the 500MB size limit.");
-      return;
-    }
-    
+    const maxSize = 500 * 1024 * 1024;
+    if (file.size > maxSize) { alert("File exceeds the 500MB size limit."); return; }
     onFileSelect(file);
   };
 
@@ -69,49 +52,34 @@ export function DragDropUpload({ onFileSelect, selectedFile, onClear }) {
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={cn(
-            "w-full border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center gap-4 cursor-pointer transition-all min-h-64",
+            "w-full border-2 border-dashed rounded-xl p-10 flex flex-col items-center justify-center gap-3 cursor-pointer transition-all duration-200 min-h-56",
             isDragActive
-              ? "border-indigo-500 bg-indigo-50/20 dark:bg-indigo-950/10 scale-101"
-              : "border-zinc-200 hover:border-indigo-400 dark:border-zinc-800 dark:hover:border-indigo-600 bg-white/50 dark:bg-zinc-950/20"
+              ? "border-teal-500 bg-teal-50/30 dark:bg-teal-950/10"
+              : "border-stone-200 hover:border-teal-400 dark:border-stone-700 dark:hover:border-teal-600 bg-stone-50/30 dark:bg-stone-950/20"
           )}
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".mp4,.mp3,.wav,.pdf"
-            onChange={handleChange}
-            className="hidden"
-          />
-          <div className="w-12 h-12 rounded-full bg-indigo-50 dark:bg-indigo-950/40 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <UploadCloud size={24} />
+          <input ref={fileInputRef} type="file" accept=".mp4,.mp3,.wav,.pdf,.txt,.docx,.json" onChange={handleChange} className="hidden" />
+          <div className="w-11 h-11 rounded-full bg-teal-50 dark:bg-teal-950/40 flex items-center justify-center text-teal-600 dark:text-teal-400">
+            <UploadCloud size={22} />
           </div>
           <div className="text-center">
-            <p className="text-sm font-semibold text-zinc-850 dark:text-zinc-200">
-              Drag & drop meeting file or <span className="text-indigo-650 font-bold hover:underline">browse</span>
+            <p className="text-sm font-medium text-stone-600 dark:text-stone-200">
+              Drag & drop or <span className="text-teal-650 dark:text-teal-400 font-semibold">browse</span>
             </p>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
-              Supports MP4, MP3, WAV, or PDF (Max 500MB)
-            </p>
+            <p className="text-[12px] text-stone-400 dark:text-stone-500 mt-1">MP4, MP3, WAV, PDF, TXT (Max 500MB)</p>
           </div>
         </div>
       ) : (
-        <div className="border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-2xl p-5 flex items-center gap-4 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
-            <File size={22} />
+        <div className="border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 rounded-xl p-4 flex items-center gap-3 shadow-card">
+          <div className="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center flex-shrink-0">
+            <File size={18} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate">
-              {selectedFile.name}
-            </p>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
-              {formatBytes(selectedFile.size)} • Ready for upload
-            </p>
+            <p className="text-sm font-medium text-stone-800 dark:text-stone-100 truncate">{selectedFile.name}</p>
+            <p className="text-[12px] text-stone-400 dark:text-stone-500 mt-0.5">{formatBytes(selectedFile.size)} • Ready</p>
           </div>
-          <button
-            onClick={onClear}
-            className="p-2 text-zinc-400 hover:text-red-500 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors cursor-pointer"
-          >
-            <Trash2 size={16} />
+          <button onClick={onClear} className="p-1.5 text-stone-400 hover:text-red-500 rounded-md hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors cursor-pointer">
+            <Trash2 size={15} />
           </button>
         </div>
       )}
