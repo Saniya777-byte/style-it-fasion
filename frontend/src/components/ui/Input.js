@@ -17,7 +17,7 @@ export const Input = React.forwardRef(({
       {label && (
         <label
           htmlFor={id}
-          className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+          className="text-[13px] font-medium text-stone-600 dark:text-stone-400"
         >
           {label}
         </label>
@@ -27,21 +27,21 @@ export const Input = React.forwardRef(({
         ref={ref}
         type={type}
         className={cn(
-          "w-full px-4 py-2.5 rounded-xl border bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all",
+          "w-full px-3.5 py-2.5 rounded-lg border bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 text-sm placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-teal-600/20 focus:border-teal-600 dark:focus:ring-teal-400/20 dark:focus:border-teal-400 transition-colors duration-150",
           error
-            ? "border-red-500 focus:border-red-500 focus:ring-red-500/10"
-            : "border-zinc-200 dark:border-zinc-800",
+            ? "border-red-400 focus:border-red-500 focus:ring-red-500/15 dark:border-red-500"
+            : "border-stone-200 dark:border-stone-700",
           className
         )}
         {...props}
       />
       {error && (
-        <span className="text-xs text-red-500 font-medium mt-0.5">
+        <span className="text-[13px] text-red-500 dark:text-red-400 font-medium">
           {error.message || error}
         </span>
       )}
       {!error && helperText && (
-        <span className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+        <span className="text-[13px] text-stone-400 dark:text-stone-500">
           {helperText}
         </span>
       )}
