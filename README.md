@@ -1,21 +1,10 @@
-# Veritas AI — Meeting Management & Compliance Platform
+# Veritas AI - Meeting Management & Compliance Platform
 
 Veritas AI is a secure, enterprise-grade AI-powered meeting governance and compliance platform. The application ingests corporate meeting records (video or audio), performs automated natural language transcription, audits conversational content against global compliance frameworks (such as GDPR, SOC 2, HIPAA, and custom rules), and generates certified executive summaries and speaking analytics.
 
 ---
 
-## 📸 Screenshots
-
-> [!NOTE]
-> Update these paths once active screenshots are generated on your production hosting instance.
-
-| Executive Dashboard (Light Mode) | Compliance Audits (Dark Mode) |
-| --- | --- |
-| ![Dashboard Light Mode](https://via.placeholder.com/600x350?text=Executive+Dashboard+Light+Mode) | ![Compliance Log Dark Mode](https://via.placeholder.com/600x350?text=Compliance+Log+Dark+Mode) |
-
----
-
-## ✨ Features
+## Features
 
 - **Ingestion Pipeline**: Drag-and-drop secure media upload supporting multiple file formats (MP3, WAV, MP4) with size and duration auditing.
 - **Whisper AI Diarization**: Multi-speaker transcription that isolates speaker channels, cleans noise patterns, and provides speech-to-text outputs.
@@ -27,7 +16,7 @@ Veritas AI is a secure, enterprise-grade AI-powered meeting governance and compl
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend Client
 - **Core Framework**: React 19 & Next.js 15 (App Router, Static & Server rendering)
@@ -46,7 +35,7 @@ Veritas AI is a secure, enterprise-grade AI-powered meeting governance and compl
 
 ---
 
-## 📐 Architecture Overview
+## Architecture Overview
 
 Veritas AI follows a clean, decoupled architecture:
 
@@ -61,7 +50,7 @@ graph TD
 
 ---
 
-## 📁 Folder Structure
+## Folder Structure
 
 ```
 style-it-fasion/
@@ -94,7 +83,7 @@ style-it-fasion/
 
 ---
 
-## 🔄 Project Workflows
+## Project Workflows
 
 ### User Journey Workflow
 ```mermaid
@@ -136,7 +125,7 @@ graph LR
 
 ---
 
-## 🗄️ Database Schema Overview
+## Database Schema Overview
 
 ```prisma
 model User {
@@ -203,7 +192,7 @@ model MissingClause {
 
 ---
 
-## 🔌 API Reference
+## API Reference
 
 ### Authentication
 - `POST /api/auth/register` - Create user compliance profile.
@@ -223,7 +212,7 @@ model MissingClause {
 
 ---
 
-## ⚙️ Environment Variables
+## Environment Variables
 
 ### Backend Server Configurations
 Create `backend/.env`:
@@ -241,7 +230,7 @@ NEXT_PUBLIC_API_URL="http://localhost:5000"
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Database Initialization
 Ensure a PostgreSQL server instance is active. In `backend/`:
