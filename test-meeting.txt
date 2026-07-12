@@ -1,0 +1,4 @@
+Veritas AI meeting transcript test text.
+Alex: We need to comply with SOC 2 policies.
+Elena: All logs are encrypted using SHA-256.
+Marcus: Sounds solid.
