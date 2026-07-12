@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
-import { Bell, Search, Sun, Moon, Calendar, Command } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Bell, Search, Sun, Moon, Command } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { formatTimeAgo } from "../../utils/formatDate";
 
@@ -9,8 +9,26 @@ export function Navbar({ title }) {
   const { user } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const notifRef = useRef(null);
 
-  const mockNotifications = [
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      setDarkMode(document.documentElement.classList.contains("dark"));
+    }
+  }, []);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const notifications = [
     { id: 1, text: "Report 'Q3 Financial Review' is ready", time: new Date(Date.now() - 1000 * 60 * 15).toISOString(), read: false },
     { id: 2, text: "Compliance risk detected in 'Aether Sec'", time: new Date(Date.now() - 1000 * 60 * 120).toISOString(), read: false },
     { id: 3, text: "Verification audit logs uploaded", time: new Date(Date.now() - 1000 * 60 * 600).toISOString(), read: true }
@@ -24,25 +42,21 @@ export function Navbar({ title }) {
   };
 
   return (
-    <header className="h-16 border-b border-zinc-150 bg-white/80 dark:border-zinc-850 dark:bg-zinc-950/80 backdrop-blur-md px-6 flex items-center justify-between z-10 select-none">
-      {/* Title / Breadcrumb */}
-      <div>
-        <h1 className="text-base font-bold text-zinc-950 dark:text-zinc-50 tracking-tight">
-          {title || "Dashboard"}
-        </h1>
-      </div>
+    <header className="h-14 border-b border-stone-200/80 bg-white/90 dark:border-stone-800/80 dark:bg-stone-925/90 backdrop-blur-lg px-6 flex items-center justify-between z-10 select-none flex-shrink-0">
+      <h1 className="text-[15px] font-semibold text-stone-900 dark:text-stone-100 tracking-tight">
+        {title || "Dashboard"}
+      </h1>
 
-      {/* Action Items */}
-      <div className="flex items-center gap-4">
-        {/* Search Input Simulation */}
-        <div className="relative hidden md:block">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500" size={15} />
+      <div className="flex items-center gap-1.5">
+        {/* Search */}
+        <div className="relative hidden md:block mr-2">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 dark:text-stone-500" size={14} />
           <input
             type="text"
-            placeholder="Search reports or transcripts..."
-            className="pl-9.5 pr-4 py-1.5 w-64 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-xs placeholder:text-zinc-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Search..."
+            className="pl-8.5 pr-4 py-1.5 w-48 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-[13px] text-stone-700 dark:text-stone-200 placeholder:text-stone-400 dark:placeholder:text-stone-500 focus:outline-none focus:ring-1 focus:ring-teal-600 focus:border-teal-600 dark:focus:ring-teal-400 dark:focus:border-teal-400 transition-colors"
           />
-          <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-800 text-[9px] font-mono text-zinc-400 bg-white dark:bg-zinc-950 flex items-center gap-0.5 pointer-events-none">
+          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded border border-stone-200 dark:border-stone-700 text-[9px] font-mono text-stone-400 dark:text-stone-500 bg-white dark:bg-stone-900 flex items-center gap-0.5 pointer-events-none">
             <Command size={8} />K
           </kbd>
         </div>
@@ -50,46 +64,48 @@ export function Navbar({ title }) {
         {/* Theme Toggle */}
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-lg text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+          className="p-2 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-600 dark:hover:text-stone-200 transition-colors cursor-pointer"
+          aria-label="Toggle dark mode"
         >
-          {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+          {darkMode ? <Sun size={16} /> : <Moon size={16} />}
         </button>
 
-        {/* Notifications Popover */}
-        <div className="relative">
+        {/* Notifications */}
+        <div className="relative" ref={notifRef}>
           <button
             onClick={() => setShowNotifications(!showNotifications)}
-            className="p-2 rounded-lg text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors relative cursor-pointer"
+            className="p-2 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 hover:text-stone-600 dark:hover:text-stone-200 transition-colors relative cursor-pointer"
+            aria-label="View notifications"
           >
-            <Bell size={17} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-indigo-600 ring-2 ring-white dark:ring-zinc-950" />
+            <Bell size={16} />
+            <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400" />
           </button>
 
           {showNotifications && (
-            <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl overflow-hidden z-20">
-              <div className="p-4 border-b border-zinc-100 dark:border-zinc-900 flex justify-between items-center">
-                <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">
-                  Recent Alerts
+            <div className="absolute right-0 mt-2 w-80 rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 shadow-lg overflow-hidden z-20">
+              <div className="px-4 py-3 border-b border-stone-100 dark:border-stone-800 flex justify-between items-center">
+                <span className="text-[13px] font-semibold text-stone-900 dark:text-stone-100">
+                  Notifications
                 </span>
-                <span className="text-[10px] text-indigo-600 font-semibold cursor-pointer">
+                <span className="text-[11px] text-teal-600 dark:text-teal-400 font-medium cursor-pointer hover:underline">
                   Mark all read
                 </span>
               </div>
               <div className="max-h-72 overflow-y-auto">
-                {mockNotifications.map((notif) => (
+                {notifications.map((notif) => (
                   <div
                     key={notif.id}
-                    className="p-4 border-b border-zinc-50 dark:border-zinc-900/40 hover:bg-zinc-50 dark:hover:bg-zinc-900/30 transition-colors flex flex-col gap-1 cursor-pointer"
+                    className="px-4 py-3 border-b border-stone-50 dark:border-stone-800/40 hover:bg-stone-50 dark:hover:bg-stone-800/30 transition-colors flex flex-col gap-1 cursor-pointer last:border-b-0"
                   >
-                    <div className="flex justify-between items-start">
-                      <span className={`text-xs ${notif.read ? "text-zinc-650" : "font-semibold text-zinc-900 dark:text-zinc-100"}`}>
+                    <div className="flex justify-between items-start gap-2">
+                      <span className={`text-[13px] leading-snug ${notif.read ? "text-stone-500 dark:text-stone-400" : "font-medium text-stone-800 dark:text-stone-100"}`}>
                         {notif.text}
                       </span>
                       {!notif.read && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-1 flex-shrink-0" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-teal-600 dark:bg-teal-400 mt-1 flex-shrink-0" />
                       )}
                     </div>
-                    <span className="text-[10px] text-zinc-400 dark:text-zinc-500">
+                    <span className="text-[11px] text-stone-400 dark:text-stone-500">
                       {formatTimeAgo(notif.time)}
                     </span>
                   </div>

@@ -8,7 +8,7 @@ import { Button } from "../components/ui/Button";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-black p-6 font-sans select-none">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 font-sans select-none">
       <div className="w-full max-w-md text-center flex flex-col items-center gap-6">
         {/* Visual 404 logo */}
         <div className="relative">
