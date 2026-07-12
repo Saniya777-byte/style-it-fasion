@@ -6,6 +6,7 @@ require("dotenv").config();
 
 const secureHeaders = require("./middleware/security.middleware");
 const { limitRequests } = require("./middleware/rateLimit.middleware");
+const prisma = require("./config/database");
 
 const authRoutes = require("./routes/auth.routes");
 const meetingRoutes = require("./routes/meeting.routes");
@@ -22,18 +23,40 @@ app.use(secureHeaders);
 app.use(limitRequests(300, 15));
 
 // Configure CORS Allowlists
-const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(",")
-  : ["http://localhost:3000", "http://localhost:3001"];
+const allowedOrigins = [];
+
+if (process.env.CLIENT_URL) {
+  allowedOrigins.push(...process.env.CLIENT_URL.split(",").map(url => url.trim()));
+}
+
+if (process.env.ALLOWED_ORIGINS) {
+  allowedOrigins.push(...process.env.ALLOWED_ORIGINS.split(",").map(url => url.trim()));
+}
+
+const isDev = process.env.NODE_ENV !== "production";
 
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow server-to-server or script requests (no origin)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes("*")) {
+      
+      if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      // Allow localhost during development
+      if (isDev) {
+        try {
+          const url = new URL(origin);
+          if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
+            return callback(null, true);
+          }
+        } catch (e) {
+          // invalid URL parsing fallback
+        }
+      }
+
       return callback(new Error("Blocked by CORS Policy: Requesting origin not allowed."));
     },
     methods: ["GET", "POST", "PUT", "DELETE"],
@@ -54,9 +77,79 @@ app.use("/api/meetings", meetingRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.json({ status: "healthy", timestamp: new Date() });
+// Production-friendly root route
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    service: "Veritas AI API",
+    status: "running",
+    version: "1.0.0"
+  });
+});
+
+// Basic API information route
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    service: "Veritas AI API",
+    version: "1.0.0",
+    description: "API Gateway for Veritas AI compliance platform",
+    endpoints: {
+      auth: "/api/auth",
+      meetings: "/api/meetings",
+      reports: "/api/reports",
+      analytics: "/api/analytics",
+      health: "/api/health"
+    }
+  });
+});
+
+// Verify Prisma connection and health route
+app.get("/api/health", async (req, res) => {
+  let databaseStatus = "disconnected";
+  let success = false;
+  let status = "unhealthy";
+
+  try {
+    // Perform simple query to verify connection
+    await prisma.$queryRaw`SELECT 1`;
+    databaseStatus = "connected";
+    success = true;
+    status = "healthy";
+  } catch (error) {
+    console.error("Database connection verification failed:", error.message || error);
+    databaseStatus = "disconnected";
+    success = false;
+    status = "unhealthy";
+  }
+
+  const response = {
+    success,
+    status,
+    database: databaseStatus,
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  };
+
+  if (success) {
+    res.json(response);
+  } else {
+    res.status(503).json(response);
+  }
+});
+
+// Maintain legacy /health route for backward compatibility
+app.get("/health", async (req, res) => {
+  let databaseStatus = "disconnected";
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    databaseStatus = "connected";
+  } catch (error) {}
+  
+  res.json({
+    status: databaseStatus === "connected" ? "healthy" : "unhealthy",
+    timestamp: new Date()
+  });
 });
 
 // Custom 404 Route handler
@@ -78,6 +171,14 @@ app.use((err, req, res, next) => {
       message = "File exceeds the maximum upload limit of 100MB";
     }
     return res.status(400).json({ message });
+  }
+
+  // Handle Prisma Database connection or validation errors cleanly
+  if (err.name && err.name.includes("Prisma")) {
+    console.error("Prisma Database Error:", err.message || err);
+    return res.status(503).json({
+      message: "Database service is temporarily unavailable or misconfigured."
+    });
   }
 
   console.error("Global error handler caught exception:", err.message || err);

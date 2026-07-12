@@ -11,7 +11,11 @@ const protect = async (req, res, next) => {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET || "veritas_secure_audit_secret_key_2026");
+      const secret = process.env.JWT_SECRET;
+      if (!secret && process.env.NODE_ENV === "production") {
+        throw new Error("JWT_SECRET environment variable is missing in production!");
+      }
+      const decoded = jwt.verify(token, secret || "veritas_secure_audit_secret_key_2026");
 
       const user = await prisma.user.findUnique({
         where: { id: decoded.id },
