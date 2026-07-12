@@ -42,12 +42,12 @@ export default function ReportsListPage() {
   }, []);
 
   const filteredReports = reports.filter(r => 
-    r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    r.company.toLowerCase().includes(searchQuery.toLowerCase())
+    r.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    r.company?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50 dark:bg-black font-sans">
+    <div className="flex h-screen overflow-hidden bg-stone-50 dark:bg-stone-950 font-sans">
       <Sidebar />
 
       <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
@@ -56,23 +56,23 @@ export default function ReportsListPage() {
         <main className="p-6 max-w-6xl w-full mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-50 tracking-tight">
+              <h2 className="text-xl font-bold text-stone-900 dark:text-stone-50 tracking-tight">
                 All Audit Reports
               </h2>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-1">
+              <p className="text-xs text-stone-400 dark:text-stone-500 mt-1">
                 Browse, search, and export compiled intelligence for all audited meetings
               </p>
             </div>
             
             {/* Search Box */}
             <div className="relative w-full sm:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" size={14} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-450 dark:text-stone-500" size={14} />
               <input
                 type="text"
                 placeholder="Search by title or company..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9.5 pr-4 py-2 w-full text-xs rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                className="pl-9.5 pr-4 py-2 w-full text-xs rounded-xl border border-stone-200 dark:border-stone-850 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 focus:outline-none focus:ring-1 focus:ring-teal-600 focus:border-teal-650"
               />
             </div>
           </div>
@@ -80,8 +80,8 @@ export default function ReportsListPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {loading ? (
               <div className="col-span-2 p-8 space-y-4">
-                <div className="h-10 bg-zinc-100 dark:bg-zinc-900 rounded-xl animate-pulse" />
-                <div className="h-10 bg-zinc-100 dark:bg-zinc-900 rounded-xl animate-pulse" />
+                <div className="h-10 bg-stone-100 dark:bg-stone-900 rounded-xl animate-pulse" />
+                <div className="h-10 bg-stone-100 dark:bg-stone-900 rounded-xl animate-pulse" />
               </div>
             ) : filteredReports.length > 0 ? (
               filteredReports.map((report) => {
@@ -91,33 +91,33 @@ export default function ReportsListPage() {
                     key={report.id}
                     hoverable
                     onClick={() => router.push(isProcessing ? ROUTES.PROCESSING : `/report/${report.id}`)}
-                    className="p-5 flex flex-col justify-between gap-4 cursor-pointer"
+                    className="p-5 flex flex-col justify-between gap-4 cursor-pointer border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900"
                   >
                     <div>
                       <div className="flex justify-between items-start gap-4 mb-2">
                         <Badge variant={isProcessing ? "warning" : "success"}>
                           {isProcessing ? "Processing" : "Audit Complete"}
                         </Badge>
-                        <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">
+                        <span className="text-[10px] font-semibold text-stone-405 dark:text-stone-500">
                           {formatDate(report.date)}
                         </span>
                       </div>
-                      <h3 className="font-bold text-sm text-zinc-900 dark:text-zinc-150 leading-tight">
+                      <h3 className="font-bold text-sm text-stone-900 dark:text-stone-150 leading-tight">
                         {report.title}
                       </h3>
-                      <p className="text-[11px] text-zinc-450 dark:text-zinc-500 mt-1">
+                      <p className="text-[11px] text-stone-450 dark:text-stone-500 mt-1">
                         {report.company} • {report.country}
                       </p>
                     </div>
 
-                    <div className="flex items-center justify-between border-t border-zinc-100 dark:border-zinc-900/60 pt-3.5 mt-2">
+                    <div className="flex items-center justify-between border-t border-stone-100 dark:border-stone-850 pt-3.5 mt-2">
                       <div className="flex items-center gap-1">
-                        <Layers size={13} className="text-zinc-400" />
-                        <span className="text-[10px] text-zinc-450 dark:text-zinc-500">
+                        <Layers size={13} className="text-stone-400" />
+                        <span className="text-[10px] text-stone-450 dark:text-stone-500">
                           {report.complianceScore ? `${report.complianceScore}% Score` : "Awaiting AI Check"}
                         </span>
                       </div>
-                      <span className="text-xs text-indigo-650 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold flex items-center gap-0.5">
+                      <span className="text-xs text-teal-650 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-350 font-bold flex items-center gap-0.5">
                         <span>Open Report</span>
                         <ArrowUpRight size={13} />
                       </span>
@@ -127,8 +127,8 @@ export default function ReportsListPage() {
               })
             ) : (
               <div className="col-span-2 p-12 text-center flex flex-col items-center gap-3">
-                <FolderOpen size={28} className="text-zinc-300" />
-                <p className="text-xs text-zinc-450 dark:text-zinc-500">No reports match your current query.</p>
+                <FolderOpen size={28} className="text-stone-300 dark:text-stone-750" />
+                <p className="text-xs text-stone-450 dark:text-stone-500">No reports match your current query.</p>
               </div>
             )}
           </div>
