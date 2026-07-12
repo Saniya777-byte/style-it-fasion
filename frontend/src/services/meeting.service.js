@@ -3,7 +3,7 @@ import api from "./api";
 export const meetingService = {
   async getMeetings() {
     try {
-      const response = await api.get("/meetings").catch(err => err);
+      const response = await api.get("/meetings");
       return response.data.meetings;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to fetch meetings");
@@ -12,11 +12,11 @@ export const meetingService = {
 
   async uploadMeeting(formData) {
     try {
-      const response = await api.post("/meetings", formData, {
+      const response = await api.post("/meetings/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data"
         }
-      }).catch(err => err);
+      });
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to upload meeting");
