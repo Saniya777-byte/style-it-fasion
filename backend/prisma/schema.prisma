@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  email     String    @unique
+  password  String
+  company   String
+  role      String    @default("Compliance Officer")
+  meetings  Meeting[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Meeting {
+  id                  String   @id @default(uuid())
+  title               String
+  company             String
+  date                DateTime @default(now())
+  duration            String
+  fileSize            String
+  fileName            String
+  filePath            String
+  status              String   @default("Processing")
+  language            String
+  country             String
+  complianceFramework String
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report              Report?
+  createdAt           DateTime @default(now())
+}
+
+model Report {
+  id              String          @id @default(uuid())
+  meetingId       String          @unique
+  meeting         Meeting         @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  complianceScore Int?
+  transcript      String          @db.Text
+  aiSummary       String          @db.Text
+  risks           Risk[]
+  missingClauses  MissingClause[]
+  speakerStats    SpeakerStat[]
+  topicDists      TopicDist[]
+  timelines       SpeakingTimeline[]
+  createdAt       DateTime        @default(now())
+}
+
+model Risk {
+  id          String   @id @default(uuid())
+  reportId    String
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  severity    String   // "high" | "medium" | "low"
+  clause      String
+  description String   @db.Text
+  timestamp   String
+}
+
+model MissingClause {
+  id          String   @id @default(uuid())
+  reportId    String
+  report      Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  clause      String
+  description String   @db.Text
+  mitigation  String   @db.Text
+}
+
+model SpeakerStat {
+  id         String   @id @default(uuid())
+  reportId   String
+  report     Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  name       String
+  percentage Int
+  sentiment  Int
+}
+
+model TopicDist {
+  id       String   @id @default(uuid())
+  reportId String
+  report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  topic    String
+  value    Int
+}
+
+model SpeakingTimeline {
+  id        String   @id @default(uuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  timestamp String
+  alex      Int
+  elena     Int
+  marcus    Int
+}

@@ -1,0 +1,44 @@
+const jwt = require("jsonwebtoken");
+const prisma = require("../config/database");
+
+const protect = async (req, res, next) => {
+  let token;
+
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
+    try {
+      token = req.headers.authorization.split(" ")[1];
+
+      const decoded = jwt.verify(token, process.env.JWT_SECRET || "veritas_secure_audit_secret_key_2026");
+
+      const user = await prisma.user.findUnique({
+        where: { id: decoded.id },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          company: true,
+          role: true,
+        },
+      });
+
+      if (!user) {
+        return res.status(401).json({ message: "Not authorized, user not found" });
+      }
+
+      req.user = user;
+      next();
+    } catch (error) {
+      console.error("JWT verification error:", error);
+      return res.status(401).json({ message: "Not authorized, token failed" });
+    }
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: "Not authorized, no token provided" });
+  }
+};
+
+module.exports = { protect };
