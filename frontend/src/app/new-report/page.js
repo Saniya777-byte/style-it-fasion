@@ -14,7 +14,7 @@ export default function NewReportOptions() {
   const router = useRouter();
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-50 dark:bg-black font-sans">
+    <div className="flex h-screen overflow-hidden bg-background font-sans">
       <Sidebar />
 
       <div className="flex-1 flex flex-col overflow-y-auto min-w-0">
