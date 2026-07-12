@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { ShieldCheck, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { useAuth } from "../../hooks/useAuth";
 import { ROUTES } from "../../constants";
 import { Input } from "../../components/ui/Input";
@@ -14,7 +15,7 @@ import { Button } from "../../components/ui/Button";
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your full name"),
-  email: z.string().email("Please enter a valid corporate email address"),
+  email: z.string().email("Please enter a valid email address"),
   company: z.string().min(2, "Please enter your organization name"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
@@ -25,11 +26,7 @@ export default function RegisterPage() {
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm({
+  const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(schema)
   });
 
@@ -47,81 +44,42 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black p-4 select-none">
-      <div className="w-full max-w-md bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-8 shadow-2xl flex flex-col gap-6">
-        {/* Brand Header */}
-        <div className="flex flex-col items-center text-center gap-1.5">
-          <div className="w-10 h-10 rounded-xl bg-indigo-650 flex items-center justify-center text-white font-bold text-xl shadow-md">
-            V
-          </div>
-          <h2 className="text-xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 mt-3">
-            Create corporate workspace
-          </h2>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            Set up automatic AI auditing for your team
-          </p>
+    <div className="min-h-screen flex items-center justify-center bg-stone-50 dark:bg-stone-950 p-4 select-none">
+      <motion.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="w-full max-w-sm bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-xl p-7 shadow-card flex flex-col gap-6"
+      >
+        <div className="flex flex-col items-center text-center gap-1">
+          <div className="w-9 h-9 rounded-lg bg-teal-650 flex items-center justify-center text-white font-bold text-base mb-2">V</div>
+          <h2 className="text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-50">Create workspace</h2>
+          <p className="text-[13px] text-stone-400 dark:text-stone-500">Set up AI auditing for your team</p>
         </div>
 
         {errorMsg && (
-          <div className="p-3 border border-red-200 bg-red-50/50 rounded-xl text-xs text-red-650 font-semibold dark:bg-red-950/20 dark:border-red-900/40">
+          <div className="p-3 border border-red-200 dark:border-red-800/40 bg-red-50 dark:bg-red-950/20 rounded-lg text-[13px] text-red-600 dark:text-red-400 font-medium">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <Input
-            id="name"
-            label="Full Name"
-            placeholder="Sarah Chen"
-            error={errors.name}
-            {...register("name")}
-          />
-
-          <Input
-            id="email"
-            type="email"
-            label="Corporate Email"
-            placeholder="sarah.chen@globalfinance.com"
-            error={errors.email}
-            {...register("email")}
-          />
-
-          <Input
-            id="company"
-            label="Enterprise / Company"
-            placeholder="Global Finance Corp"
-            error={errors.company}
-            {...register("company")}
-          />
-
-          <Input
-            id="password"
-            type="password"
-            label="Password"
-            placeholder="••••••••"
-            error={errors.password}
-            {...register("password")}
-          />
-
-          <Button
-            type="submit"
-            className="w-full"
-            loading={loading}
-          >
-            <span>Create Workspace</span>
-            <ArrowRight size={15} className="ml-2" />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
+          <Input id="name" label="Full Name" placeholder="Sarah Chen" error={errors.name} {...register("name")} />
+          <Input id="email" type="email" label="Email" placeholder="sarah@company.com" error={errors.email} {...register("email")} />
+          <Input id="company" label="Company" placeholder="Acme Corp" error={errors.company} {...register("company")} />
+          <Input id="password" type="password" label="Password" placeholder="••••••••" error={errors.password} {...register("password")} />
+          <Button type="submit" className="w-full" loading={loading}>
+            Create workspace<ArrowRight size={14} className="ml-1" />
           </Button>
         </form>
 
-        <div className="text-center text-xs border-t border-zinc-100 dark:border-zinc-900 pt-4">
-          <span className="text-zinc-400 dark:text-zinc-500">
-            Already have an enterprise account?{" "}
-            <Link href={ROUTES.LOGIN} className="text-indigo-600 font-bold hover:underline">
-              Sign In
-            </Link>
+        <div className="text-center text-[13px] border-t border-stone-100 dark:border-stone-800 pt-4">
+          <span className="text-stone-400 dark:text-stone-500">
+            Already have an account?{" "}
+            <Link href={ROUTES.LOGIN} className="text-teal-650 dark:text-teal-400 font-medium hover:underline">Sign in</Link>
           </span>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
